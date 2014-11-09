@@ -1,0 +1,184 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+check-lm-sensors - Plugin to check the temperature.
+
+=head1 SYNOPSIS
+
+    check-lm-sensors [ OPTIONS ]
+
+    check-lm-sensors --help
+
+=head1 REPORTING BUGS
+
+Please report all bugs to <support(at)bloonix.de>.
+
+=head1 AUTHOR
+
+Jonny Schulz <support(at)bloonix.de>.
+
+=head1 POWERED BY
+
+     _    __ _____ _____ __  __ __ __   __
+    | |__|  |     |     |  \|  |__|\  \/  /
+    |  . |  |  |  |  |  |      |  | >    <
+    |____|__|_____|_____|__|\__|__|/__/\__\
+
+=head1 COPYRIGHT
+
+Copyright (C) 2012-2014 by Jonny Schulz. All rights reserved.
+
+=cut
+
+use strict;
+use warnings;
+use Bloonix::Plugin;
+
+# --------------------------------------------------
+# Plugin options
+# --------------------------------------------------
+
+my $plugin = Bloonix::Plugin->new(version => "0.3");
+
+$plugin->add_option(
+    name => "Sensor",
+    option => "sensor",
+    value => "sensor",
+    value_type => "string",
+    mandatory => 1,
+    description => "This is the name of the sensor to check."
+);
+
+$plugin->add_option(
+    name => "Warning threshold",
+    option => "warning",
+    value => "temporature",
+    value_type => "int",
+    description => "This is the warning threshold to check the temperatur."
+);
+
+$plugin->add_option(
+    name => "Critical threshold",
+    option => "critical",
+    value => "temporature",
+    value_type => "int",
+    description => "This is the critical threshold to check the temperatur."
+);
+
+$plugin->add_option(
+    option => "verbose",
+    command_line_only => 1,
+    description => "Show a verbose output."
+);
+
+$plugin->example(
+    description => [
+        "Example to check the temperature of the cpu cores and trigger",
+        "",
+        "- a warning status if the temperature is higher than or equal 80 degrees",
+        "- or a critical status if the temperature is higher than or equal 100 degrees"
+    ],
+    arguments => [
+        sensor => "Physical id 0",
+        warning => 80,
+        critical => 100
+    ]
+);
+
+$plugin->one_must_have_options("warning", "critical");
+
+# --------------------------------------------------
+# Parse options
+# --------------------------------------------------
+
+my $opt = $plugin->parse_options;
+my $sensors = "sensors";
+
+# --------------------------------------------------
+# Load statistics
+# --------------------------------------------------
+
+my @output;
+my $stat = { };
+
+eval {
+    $SIG{__DIE__} = sub { alarm(0) };
+    $SIG{ALRM} = sub { die "timeout" };
+    alarm(15);
+    @output = qx{$sensors -A 2>&1};
+    die "sensors exit code $?" if $?;
+    @output = grep /:/, @output;
+    alarm(0);
+};
+
+my $err = $@;
+
+if ($err) {
+    chomp $err;
+
+    if ($err =~ /^timeout/) {
+        $plugin->exit(
+            status => "CRITICAL",
+            message => "plugin timed out after 10 seconds"
+        );
+    }
+
+    $plugin->exit(
+        status => "UNKNOWN",
+        message => "execution error: $err"
+    );
+}
+
+if (!@output || $output[0] =~ /^No sensors found/) {
+    $plugin->exit(
+        status => "UNKNOWN",
+        message => "no sensors found"
+    );
+}
+
+foreach my $line (@output) {
+    # coretemp-isa-0000
+    # Physical id 0:  +43.0°C  (high = +80.0°C, crit = +100.0°C)
+    # Core 0:         +41.0°C  (high = +80.0°C, crit = +100.0°C)
+    # Core 1:         +43.0°C  (high = +80.0°C, crit = +100.0°C)
+    # Core 2:         +42.0°C  (high = +80.0°C, crit = +100.0°C)
+    # Core 3:         +41.0°C  (high = +80.0°C, crit = +100.0°C)
+    if ($line =~ /^([^:]+):\s*\+(\d+(?:\.\d+){0,1})(?:°|\s)C/) {
+        my ($name, $value) = ($1, $2);
+
+        if ($opt->{verbose}) {
+            print STDERR "found sensor $name: $value\n";
+        }
+
+        if ($name eq $opt->{sensor}) {
+            $stat->{temperature} = $value;
+        }
+    }
+}
+
+if (!scalar keys %$stat) {
+    $plugin->exit(
+        status => "UNKNOWN",
+        message => "sensor '$opt->{sensor}' not found"
+    );
+}
+
+
+# --------------------------------------------------
+# Check warning and critical
+# --------------------------------------------------
+
+my $status = "OK";
+
+if ($opt->{critical} && $stat->{temperature} >= $opt->{critical}) {
+    $status = "CRITICAL";
+} elsif ($opt->{warning} && $stat->{temperature} >= $opt->{warning}) {
+    $status = "WARNING";
+}
+
+$plugin->exit(
+    status => $status,
+    message => "temperature of $opt->{sensor} is $stat->{temperature}°C",
+    stats => $stat
+);

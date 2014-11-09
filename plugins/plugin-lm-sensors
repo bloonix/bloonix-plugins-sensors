@@ -1,0 +1,32 @@
+plugin {
+    id 50
+    plugin Linux.Sensors
+    command check-lm-sensors
+    datatype statistic
+    category System,Temperature,Linux
+    abstract Temperature check
+    description Hardware temperature.
+}
+
+statistic {
+    statkey temperature
+    alias Temperature
+    datatype float
+    units temperature
+    description The temperatur of the sensor.
+}
+
+chart {
+    id 1
+    title Temperature
+    options {
+        ylabel celsius
+        units null
+        chart-type area
+        series {
+            name temperature
+            color \#005467
+        }
+    }
+}
+

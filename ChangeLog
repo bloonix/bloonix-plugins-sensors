@@ -1,0 +1,19 @@
+bloonix-plugins-sensors (0.5) released at 2014-11-03
+
+    * Updated the license information.
+
+bloonix-plugins-sensors (0.4) released at 2014-08-25
+
+    * Licence added and old releases deleted.
+
+blonix-plugins-sensors (0.3) released at 2014-03-23
+
+    * Complete rewrite of all plugins.
+
+bloonix-plugins-sensors (0.2) released at 2013-05-14
+
+    * The statistics of all plugins is now printed in JSON format.
+
+bloonix-plugins-sensors (0.1) released at 2012-05-08
+
+    * Initial release.

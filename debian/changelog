@@ -1,0 +1,23 @@
+bloonix-plugins-sensors (0.5-1) unstable; urgency=low
+
+    * Updated the license information.
+
+ -- Jonny Schulz <js@bloonix.de>  Mon, 03 Nov 2014 21:19:29 +0100
+
+bloonix-plugins-sensors (0.4-1) unstable; urgency=low
+
+    * Licence added and old releases deleted.
+
+ -- Jonny Schulz <js@bloonix.de>  Tue, 26 Aug 2014 11:45:45 +0200
+
+bloonix-plugins-sensors (0.3-1) unstable; urgency=low
+
+    * Complete rewrite of all plugins.
+
+ -- Jonny Schulz <js@bloonix.de>  Sat, 23 Mar 2014 00:00:00 +0100
+
+bloonix-plugins-sensors (0.1-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Jonny Schulz <js@bloonix.de>  Sat, 12 May 2012 19:57:57 +0200
