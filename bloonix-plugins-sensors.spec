@@ -37,6 +37,19 @@ mkdir -p ${RPM_BUILD_ROOT}%{docdir}
 install -c -m 0444 LICENSE ${RPM_BUILD_ROOT}%{docdir}/
 install -c -m 0444 ChangeLog ${RPM_BUILD_ROOT}%{docdir}/
 
+%post
+if [ ! -e "/etc/bloonix/agent/sudoers.d" ] ; then
+    mkdir -p /etc/bloonix/agent/sudoers.d
+    chown root:root /etc/bloonix/agent/sudoers.d
+    chmod 755 /etc/bloonix/agent/sudoers.d
+fi
+for f in check-lm-sensors ; do
+    if [ ! -e "/etc/bloonix/agent/sudoers.d/$f" ] ; then
+        cp -a /usr/lib/bloonix/etc/sudoers.d/$f /etc/bloonix/agent/sudoers.d/
+        chmod 440 /etc/bloonix/agent/sudoers.d/$f
+    fi
+done
+
 %clean
 rm -rf %{buildroot}
 
