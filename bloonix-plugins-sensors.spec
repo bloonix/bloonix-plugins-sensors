@@ -61,6 +61,9 @@ rm -rf %{buildroot}
 %{blxdir}/plugins/check-*
 %{blxdir}/etc/plugins/plugin-*
 
+%dir %{blxdir}/etc/sudoers.d
+%{blxdir}/etc/sudoers.d/*
+
 %dir %attr(0755, root, root) %{docdir}
 %doc %attr(0444, root, root) %{docdir}/ChangeLog
 %doc %attr(0444, root, root) %{docdir}/LICENSE
