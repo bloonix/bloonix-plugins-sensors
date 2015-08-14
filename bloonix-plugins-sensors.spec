@@ -1,6 +1,6 @@
 Summary: Bloonix plugins to check sensors.
 Name: bloonix-plugins-sensors
-Version: 0.6
+Version: 0.7
 Release: 1%{dist}
 License: Commercial
 Group: Utilities/System
@@ -83,6 +83,9 @@ rm -rf %{buildroot}
 %doc %attr(0444, root, root) %{docdir}/LICENSE
 
 %changelog
+* Fri Aug 14 2015 Jonny Schulz <js@bloonix.de> - 0.7-1
+- Added a configuration file with use_sudo for each check that
+  to executed via sudo.
 * Thu Aug 13 2015 Jonny Schulz <js@bloonix.de> - 0.6-1
 - Added sudoers/check-lm-sensors.
 * Mon Nov 03 2014 Jonny Schulz <js@bloonix.de> - 0.5-1
