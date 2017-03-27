@@ -53,7 +53,7 @@ $plugin->add_option(
 $plugin->add_option(
     name => "Warning threshold",
     option => "warning",
-    value => "temporature",
+    value => "temperature",
     value_type => "int",
     description => "This is the warning threshold to check the temperatur."
 );
@@ -61,7 +61,7 @@ $plugin->add_option(
 $plugin->add_option(
     name => "Critical threshold",
     option => "critical",
-    value => "temporature",
+    value => "temperature",
     value_type => "int",
     description => "This is the critical threshold to check the temperatur."
 );
